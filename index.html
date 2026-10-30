@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Conlife – redirecionando…</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3 4.7 9.5v13L16 29l11.3-6.5-5.6-3.3L16 22.4l-5.7-3.3v-6.2L16 9.6l5.7 3.3 5.6-3.3z' fill='%23FF6A1A'/%3E%3C/svg%3E">
+<style>
+  :root{--marinho:#111F5E;--laranja:#FF6A1A;--apoio:#5B6280}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{display:flex;align-items:center;justify-content:center;background:#fff;font-family:Montserrat,"Segoe UI",Roboto,Arial,sans-serif;color:var(--marinho)}
+  .caixa{text-align:center;padding:24px}
+  .marca{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:.14em}
+  .giro{width:34px;height:34px;margin:28px auto 16px;border:3.5px solid #E3E7F2;border-top-color:var(--laranja);border-radius:50%;animation:g .8s linear infinite}
+  @keyframes g{to{transform:rotate(360deg)}}
+  p{margin:0;color:var(--apoio);font-size:15px}
+  a{color:var(--laranja);font-weight:700}
+  #alt{margin-top:18px;font-size:14px;visibility:hidden}
+  @media (prefers-reduced-motion:reduce){.giro{animation-duration:2s}}
+</style>
+</head>
+<body>
+<div class="caixa">
+  <div class="marca">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 4.7 9.5v13L16 29l11.3-6.5-5.6-3.3L16 22.4l-5.7-3.3v-6.2L16 9.6l5.7 3.3 5.6-3.3z" fill="#FF6A1A"/></svg>
+    CONLIFE
+  </div>
+  <div class="giro" role="status" aria-label="Carregando"></div>
+  <p id="msg">Redirecionando…</p>
+  <p id="alt">Se nada acontecer, <a id="lnk" href="https://www.conlife.com.br" rel="noopener">clique aqui para continuar</a>.</p>
+</div>
+<script>
+(function () {
+  /* ===================== CONFIGURAÇÃO ===================== */
+  // Cole aqui a "URL pública da Central (descadastro)" da aba Config da Central (termina em /exec)
+  var CENTRAL = 'https://script.google.com/macros/s/AKfycbzMcbC8kf5Pge-MGfGSKcNS9wgSNuKpCI5UsGKNveUj9Xilam0ivTXBKjO0uUfemKe1cA/exec';
+  // Só redireciona para estes domínios (e subdomínios). Inclua novos sites de destino aqui.
+  var PERMITIDOS = ['conlife.com.br', 'farmaconde.com.br', 'conectcar.com', 'script.google.com'];
+  var PADRAO = 'https://www.conlife.com.br';
+  /* ======================================================== */
+
+  var q = new URLSearchParams(location.search);
+  var c = q.get('c') || '', k = q.get('k') || '', u = q.get('u') || '';
+  var destino = PADRAO, valido = false;
+  try {
+    var url = new URL(u);
+    var host = url.hostname.toLowerCase();
+    valido = url.protocol === 'https:' && PERMITIDOS.some(function (d) { return host === d || host.slice(-(d.length + 1)) === '.' + d; });
+    if (valido) destino = url.href;
+  } catch (e) {}
+
+  document.getElementById('lnk').href = destino;
+  if (!valido && u) document.getElementById('msg').textContent = 'Link inválido. Levando você ao site da Conlife…';
+
+  // Registra o clique sem atrasar a pessoa (se falhar, ela segue mesmo assim)
+  if (valido && c && /^https:\/\//.test(CENTRAL)) {
+    var dados = 'ck=1&c=' + encodeURIComponent(c) + '&k=' + encodeURIComponent(k) + '&u=' + encodeURIComponent(destino);
+    var foi = false;
+    try {
+      if (navigator.sendBeacon) foi = navigator.sendBeacon(CENTRAL, new Blob([dados], { type: 'application/x-www-form-urlencoded' }));
+    } catch (e) {}
+    if (!foi) { try { new Image().src = CENTRAL + '?' + dados + '&_=' + Date.now(); } catch (e) {} }
+  }
+
+  setTimeout(function () { location.replace(destino); }, 400);
+  setTimeout(function () { document.getElementById('alt').style.visibility = 'visible'; }, 2500);
+})();
+</script>
+</body>
+</html>
