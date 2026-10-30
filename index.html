@@ -57,7 +57,7 @@
 
   // Registra o clique sem atrasar a pessoa (se falhar, ela segue mesmo assim)
   if (valido && c && /^https:\/\//.test(CENTRAL)) {
-    var dados = 'ck=1&c=' + encodeURIComponent(c) + '&k=' + encodeURIComponent(k) + '&u=' + encodeURIComponent(destino);
+    var dados = 'ck=1&cp=' + encodeURIComponent(c) + '&k=' + encodeURIComponent(k) + '&u=' + encodeURIComponent(destino);
     // Envia sem cookies (credentials: 'omit'): evita o erro do Google com várias contas logadas no navegador
     var foi = false;
     try {
